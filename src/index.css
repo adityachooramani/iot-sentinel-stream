@@ -2,95 +2,69 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* IoT HoneyNet Design System - Dark Hacker Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core IoT HoneyNet Colors */
+    --background: 150 70% 6%;        /* #0f241d */
+    --foreground: 150 30% 85%;       /* Light text */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 150 50% 18%;             /* #204b3d - Panel color */
+    --card-foreground: 150 30% 85%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 150 50% 18%;
+    --popover-foreground: 150 30% 85%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 150 95% 45%;          /* #0bda49 - Highlight/Graph/Online */
+    --primary-foreground: 150 70% 6%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 150 30% 65%;        /* #8dceb9 - Secondary text */
+    --secondary-foreground: 150 70% 6%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 150 50% 18%;
+    --muted-foreground: 150 30% 65%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 150 95% 45%;
+    --accent-foreground: 150 70% 6%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 70% 70%;        /* #f87171 - Alerts/Errors */
+    --destructive-foreground: 150 30% 85%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 150 50% 25%;
+    --input: 150 50% 18%;
+    --ring: 150 95% 45%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Custom IoT HoneyNet Design Tokens */
+    --honeypot-glow: 150 95% 45%;
+    --attack-pulse: 0 70% 70%;
+    --panel-subtle: 150 40% 20%;
+    --online-status: 150 95% 45%;
+    --offline-status: 0 0% 45%;
+    
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(150 95% 45% / 0.1), hsl(150 95% 45% / 0.05));
+    --gradient-attack: linear-gradient(135deg, hsl(0 70% 70% / 0.1), hsl(0 70% 70% / 0.05));
+    --gradient-panel: linear-gradient(145deg, hsl(150 50% 18%), hsl(150 45% 16%));
+    
+    /* Shadows & Glows */
+    --shadow-glow: 0 0 20px hsl(150 95% 45% / 0.3);
+    --shadow-attack: 0 0 20px hsl(0 70% 70% / 0.3);
+    --shadow-panel: 0 4px 20px hsl(150 70% 6% / 0.3);
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --radius: 0.75rem;
 
-    --sidebar-primary: 240 5.9% 10%;
-
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar Colors for IoT Theme */
+    --sidebar-background: 150 60% 8%;
+    --sidebar-foreground: 150 30% 85%;
+    --sidebar-primary: 150 95% 45%;
+    --sidebar-primary-foreground: 150 70% 6%;
+    --sidebar-accent: 150 50% 18%;
+    --sidebar-accent-foreground: 150 30% 85%;
+    --sidebar-border: 150 50% 25%;
+    --sidebar-ring: 150 95% 45%;
   }
 }
 
@@ -101,5 +75,86 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* IoT HoneyNet Custom Components & Animations */
+@layer components {
+  .honeypot-glow {
+    box-shadow: var(--shadow-glow);
+    animation: glow-pulse 2s ease-in-out infinite alternate;
+  }
+  
+  .attack-pulse {
+    animation: attack-flash 1s ease-in-out;
+  }
+  
+  .status-online {
+    @apply bg-primary;
+    box-shadow: 0 0 10px hsl(var(--online-status) / 0.5);
+    animation: status-pulse 2s ease-in-out infinite;
+  }
+  
+  .status-offline {
+    @apply bg-muted-foreground;
+  }
+  
+  .panel-gradient {
+    background: var(--gradient-panel);
+    box-shadow: var(--shadow-panel);
+  }
+  
+  .attack-row {
+    animation: slide-in-from-top 0.5s ease-out;
+  }
+
+  .metric-card {
+    @apply bg-card border border-border/50 rounded-lg p-6;
+    background: var(--gradient-panel);
+    transition: all 0.3s ease;
+  }
+  
+  .metric-card:hover {
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
+  }
+  
+  .glow-text {
+    text-shadow: 0 0 10px hsl(var(--honeypot-glow) / 0.8);
+  }
+}
+
+@layer utilities {
+  .text-honeypot { color: hsl(var(--honeypot-glow)); }
+  .text-attack { color: hsl(var(--attack-pulse)); }
+  .text-online { color: hsl(var(--online-status)); }
+  .text-offline { color: hsl(var(--offline-status)); }
+  .bg-panel { background: var(--gradient-panel); }
+}
+
+/* Keyframe Animations */
+@keyframes glow-pulse {
+  0% { box-shadow: 0 0 5px hsl(var(--honeypot-glow) / 0.3); }
+  100% { box-shadow: 0 0 20px hsl(var(--honeypot-glow) / 0.8); }
+}
+
+@keyframes attack-flash {
+  0%, 100% { background-color: transparent; }
+  50% { background-color: hsl(var(--attack-pulse) / 0.2); }
+}
+
+@keyframes status-pulse {
+  0%, 100% { opacity: 0.8; }
+  50% { opacity: 1; }
+}
+
+@keyframes slide-in-from-top {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
