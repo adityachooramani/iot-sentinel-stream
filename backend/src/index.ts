@@ -14,7 +14,7 @@ app.set('trust proxy', true);
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: process.env.FRONTEND_URL || 'https://iot-sentinel-stream.vercel.app',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'x-forwarded-for'],
   credentials: true
@@ -70,7 +70,7 @@ const server = createServer(app);
 // Socket.IO
 const io = new SocketIOServer(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL || 'https://iot-sentinel-stream.vercel.app',
     credentials: true
   }
 });
