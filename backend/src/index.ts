@@ -3,7 +3,7 @@ import cors from "cors";
 import router from "./routes";
 import path from "path";
 import { createServer } from "http";
-import { Server as SocketIOServer } from "socket.io";
+const { Server: SocketIOServer } = require("socket.io");
 import { setIo } from "./socket";
 import { attacks } from "./db";
 import { ApiError } from "./types";

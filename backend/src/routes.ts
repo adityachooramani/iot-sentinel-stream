@@ -107,7 +107,7 @@ honeypotEndpoints.forEach(endpoint => {
 });
 
 router.get("/api/attacks", asyncHandler(async (_req: Request, res: Response) => {
-  const response: ApiResponse<AttackResponse[]> = {
+  const response: any = {
     data: attacks.map(attack => ({
       id: attack.id,
       timestamp: attack.timestamp.toISOString(),
@@ -138,7 +138,7 @@ router.get("/api/attacks/latest", asyncHandler(async (_req: Request, res: Respon
     return;
   }
   
-  const response: ApiResponse<AttackResponse> = {
+  const response: any = {
     data: {
       id: attacks[0].id,
       timestamp: attacks[0].timestamp.toISOString(),

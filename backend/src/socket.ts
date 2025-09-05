@@ -1,12 +1,10 @@
-import { Server } from "socket.io";
+let ioInstance: any = null;
 
-let ioInstance: Server | null = null;
-
-export function setIo(instance: Server): void {
+export function setIo(instance: any): void {
 	ioInstance = instance;
 }
 
-export function getIo(): Server | null {
+export function getIo(): any {
 	return ioInstance;
 }
 
