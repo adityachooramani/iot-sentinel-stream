@@ -6,6 +6,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppSidebar } from "./components/AppSidebar";
 import Index from "./pages/Index";
+import Logs from "./pages/Logs";
+import Settings from "./pages/Settings";
+import DeviceCamera from "./pages/DeviceCamera";
+import DeviceLock from "./pages/DeviceLock";
+import DeviceRouter from "./pages/DeviceRouter";
+import Alerts from "./pages/Alerts";
+import Devices from "./pages/Devices";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +37,14 @@ const App = () => (
               </header>
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/logs" element={<Logs />} />
+                <Route path="/alerts" element={<Alerts />} />
+                <Route path="/devices" element={<Devices />} />
+                <Route path="/reports" element={<Reports />} />
+                <Route path="/settings" element={<Settings />} />
+                <Route path="/device/camera" element={<DeviceCamera />} />
+                <Route path="/device/lock" element={<DeviceLock />} />
+                <Route path="/device/router" element={<DeviceRouter />} />
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
               </Routes>

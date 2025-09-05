@@ -1,5 +1,6 @@
 import { Router, Request, Response } from "express";
-import { attacks, MAX_ATTACKS } from "./db";
+import { attacks, MAX_ATTACKS, devices, settings } from "./db";
+import { getIo } from "./socket";
 import { Attack, AsyncRequestHandler, ApiResponse } from "./types";
 import { randomUUID } from "crypto";
 
@@ -40,19 +41,57 @@ const honeypotEndpoints = ["/honeypot/camera", "/honeypot/lock", "/honeypot/rout
 
 honeypotEndpoints.forEach(endpoint => {
   router.all(endpoint, asyncHandler(async (req: Request, res: Response) => {
+    // Lightweight GeoIP enrichment
+    const ip = getClientIP(req);
+    let country: string | undefined;
+    let city: string | undefined;
+    try {
+      const controller = new AbortController();
+      const t = setTimeout(() => controller.abort(), 2000);
+      const resp = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,city` as string, { signal: controller.signal });
+      clearTimeout(t);
+      if (resp.ok) {
+        const data: any = await resp.json();
+        if (data && data.status === 'success') {
+          country = data.country;
+          city = data.city;
+        }
+      }
+    } catch {}
     const attack: Attack = {
       id: randomUUID(),
       timestamp: new Date(),
-      sourceIP: getClientIP(req),
+      sourceIP: ip,
       endpoint,
       method: req.method,
       payload: validatePayload(req.body),
       blocked: Math.random() > 0.2,
+      country,
+      city,
     };
 
     attacks.unshift(attack);
     if (attacks.length > MAX_ATTACKS) {
       attacks.length = MAX_ATTACKS;
+    }
+
+    // Update device stats when corresponding endpoint is hit
+    const deviceMap: Record<string, string> = {
+      "/honeypot/camera": "cam-001",
+      "/honeypot/lock": "lock-001",
+      "/honeypot/router": "router-001",
+    };
+    const targetId = deviceMap[endpoint];
+    const device = devices.find(d => d.id === targetId);
+    if (device) {
+      device.attacks += 1;
+      device.lastSeen = new Date().toISOString();
+    }
+
+    // Broadcast new attack over WebSocket
+    const io = getIo();
+    if (io) {
+      io.emit('new_attack', attack);
     }
 
     const response: ApiResponse<{ attackId: string }> = {
@@ -74,6 +113,13 @@ router.get("/api/attacks", asyncHandler(async (_req: Request, res: Response) => 
   res.json(response);
 }));
 
+router.get('/api/stats', asyncHandler(async (_req: Request, res: Response) => {
+  const totalAttacks = attacks.length;
+  const uniqueIps = new Set(attacks.map(a => a.sourceIP)).size;
+  const threatLevel = totalAttacks > 30 ? 'High' : totalAttacks > 10 ? 'Medium' : 'Low';
+  res.json({ data: { totalAttacks, uniqueIps, threatLevel, serverTime: new Date().toISOString() } });
+}));
+
 router.get("/api/attacks/latest", asyncHandler(async (_req: Request, res: Response) => {
   if (attacks.length === 0) {
     res.status(404).json({
@@ -89,6 +135,45 @@ router.get("/api/attacks/latest", asyncHandler(async (_req: Request, res: Respon
     }
   };
   res.json(response);
+}));
+
+// Devices and Settings endpoints
+router.get('/api/devices', asyncHandler(async (_req: Request, res: Response) => {
+  res.json({ data: devices });
+}));
+
+router.get('/api/settings', asyncHandler(async (_req: Request, res: Response) => {
+  res.json({ data: settings });
+}));
+
+router.put('/api/settings', asyncHandler(async (req: Request, res: Response) => {
+  const body = req.body as Partial<typeof settings>;
+  Object.assign(settings, body);
+  res.json({ data: settings });
+}));
+
+// Add new device
+router.post('/api/devices', asyncHandler(async (req: Request, res: Response) => {
+  const { name, type, ip, location } = req.body as { name: string; type: string; ip: string; location: string };
+  if (!name || !type || !ip || !location) {
+    res.status(400).json({ error: 'Missing required fields: name, type, ip, location' });
+    return;
+  }
+  const id = `${type}-${Math.random().toString(36).slice(2, 6)}`;
+  const newDevice = {
+    id,
+    name,
+    type,
+    status: 'online' as const,
+    attacks: 0,
+    ip,
+    location,
+    lastSeen: new Date().toISOString(),
+    firmware: '1.0.0',
+    uptime: '0d 0h'
+  };
+  devices.push(newDevice);
+  res.status(201).json({ data: newDevice });
 }));
 
 export default router;

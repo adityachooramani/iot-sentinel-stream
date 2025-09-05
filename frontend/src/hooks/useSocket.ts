@@ -1,47 +1,33 @@
 // src/hooks/useSocket.ts
 import { useEffect, useState } from "react";
+import { io, Socket } from "socket.io-client";
 import type { Attack } from "../api";
-import { fetchLatestAttack } from "../api";
+import { API_BASE_URL } from "../config";
 
 export function useSocket() {
+  const [socket, setSocket] = useState<Socket | null>(null);
   const [latestAttacks, setLatestAttacks] = useState<Attack[]>([]);
   const [newAttack, setNewAttack] = useState<Attack | null>(null);
 
   useEffect(() => {
-    let isMounted = true;
-    let lastSeenId: string | null = null;
+    const s = io(API_BASE_URL, { transports: ["websocket"], withCredentials: true });
+    setSocket(s);
 
-    const tick = async () => {
-      try {
-        const latest = await fetchLatestAttack();
-        if (!isMounted || !latest) return;
+    s.on("status", () => {
+      s.emit("request_latest_attacks");
+    });
+    s.on("latest_attacks", (data: Attack[]) => {
+      setLatestAttacks(data);
+    });
+    s.on("new_attack", (attack: Attack) => {
+      setNewAttack(attack);
+      setLatestAttacks((prev) => [attack, ...prev].slice(0, 50));
+    });
 
-        // Update rolling list
-        setLatestAttacks((prev) => {
-          const existing = prev.find((a) => a.id === latest.id);
-          if (existing) return prev;
-          const next = [latest, ...prev];
-          return next.slice(0, 50);
-        });
-
-        // Emit new item event-like update
-        if (lastSeenId !== latest.id) {
-          lastSeenId = latest.id;
-          setNewAttack(latest);
-        }
-      } catch (e) {
-        // ignore transient errors during polling
-      }
-    };
-
-    // Prime immediately, then poll
-    tick();
-    const interval = setInterval(tick, 3000);
     return () => {
-      isMounted = false;
-      clearInterval(interval);
+      s.disconnect();
     };
   }, []);
 
-  return { socket: null, latestAttacks, newAttack };
+  return { socket, latestAttacks, newAttack };
 }

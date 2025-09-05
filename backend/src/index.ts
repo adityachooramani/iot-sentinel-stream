@@ -2,9 +2,15 @@ import express, { Request, Response, NextFunction } from "express";
 import cors from "cors";
 import router from "./routes";
 import path from "path";
+import { createServer } from "http";
+import { Server as SocketIOServer } from "socket.io";
+import { setIo } from "./socket";
+import { attacks } from "./db";
 import { ApiError } from "./types";
 
 const app = express();
+// Trust reverse proxies/load balancers so X-Forwarded-For is honored
+app.set('trust proxy', true);
 const PORT = process.env.PORT || 5000;
 
 app.use(cors({
@@ -59,7 +65,25 @@ app.use((req: Request, res: Response) => {
   res.status(404).json(error);
 });
 
-const server = app.listen(PORT, () => {
+const server = createServer(app);
+
+// Socket.IO
+const io = new SocketIOServer(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    credentials: true
+  }
+});
+setIo(io);
+
+io.on('connection', (socket) => {
+  socket.emit('status', { message: 'Connected', serverTime: new Date().toISOString() });
+  socket.on('request_latest_attacks', () => {
+    socket.emit('latest_attacks', attacks.slice(0, 10));
+  });
+});
+
+server.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
 

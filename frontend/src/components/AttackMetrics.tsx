@@ -20,6 +20,8 @@ export const AttackMetrics = ({ attacks, totalAttacks }: AttackMetricsProps) => 
   const blockedAttacks = attacks.filter(a => a.blocked).length;
   const uniqueIPs = new Set(attacks.map(a => a.sourceIP)).size;
   const lastAttack = attacks[0]?.timestamp;
+  const lastAttackerIp = attacks[0]?.sourceIP;
+  const lastAttackerGeo = [attacks[0]?.city, attacks[0]?.country].filter(Boolean).join(', ');
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -67,6 +69,9 @@ export const AttackMetrics = ({ attacks, totalAttacks }: AttackMetricsProps) => 
                 "No attacks"
               )}
             </p>
+            {lastAttackerIp && (
+              <p className="text-xs text-secondary font-mono">IP: {lastAttackerIp}{lastAttackerGeo ? ` • ${lastAttackerGeo}` : ''}</p>
+            )}
           </div>
           <Clock className="w-8 h-8 text-secondary" />
         </div>

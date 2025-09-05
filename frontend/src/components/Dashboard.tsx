@@ -5,6 +5,8 @@ import { RecentAttacks } from "./RecentAttacks";
 import { DeviceStatus } from "./DeviceStatus";
 import { AttackMetrics } from "./AttackMetrics";
 import { useToast } from "@/hooks/use-toast";
+import { API_BASE_URL } from "@/config";
+import { useSocket } from "@/hooks/useSocket";
 
 interface Attack {
   id: string;
@@ -27,50 +29,49 @@ export const Dashboard = () => {
   const [totalAttacks, setTotalAttacks] = useState(0);
   const { toast } = useToast();
 
-  // Replace with your actual Railway backend API endpoint
-  const BACKEND_URL = "https://iot-honeypot-production-a864.up.railway.app";
+  const { latestAttacks, newAttack } = useSocket();
 
-  // Fetch initial attacks on mount
+  // Fetch initial attacks and stats on mount
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const res = await fetch(`${BACKEND_URL}/attacks`);
-        const data = await res.json();
-        setAttacks(data.attacks || []);
-        setTotalAttacks(data.totalAttacks || 0);
+        const [attacksRes, statsRes] = await Promise.all([
+          fetch(`${API_BASE_URL}/api/attacks`),
+          fetch(`${API_BASE_URL}/api/stats`),
+        ]);
+        const attacksJson = await attacksRes.json();
+        const statsJson = await statsRes.json();
+        const list = (attacksJson.data || []).map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) }));
+        setAttacks(list);
+        setTotalAttacks(statsJson?.data?.totalAttacks || list.length);
       } catch (err) {
-        console.error("Error fetching initial attacks:", err);
+        console.error("Error fetching initial data:", err);
       }
     };
 
     fetchInitialData();
   }, []);
 
-  // Poll for new attacks every 5 seconds
+  // Handle websocket-delivered new attacks
   useEffect(() => {
-    const interval = setInterval(async () => {
-      try {
-        const res = await fetch(`${BACKEND_URL}/attacks/latest`);
-        const newAttack = await res.json();
+    if (!newAttack) return;
+    const attack = { ...newAttack, timestamp: new Date(newAttack.timestamp) } as any;
+    setAttacks((prev) => [attack, ...prev].slice(0, 50));
+    setTotalAttacks((prev) => prev + 1);
+    toast({
+      title: "🚨 New Attack Detected",
+      description: `Attack on ${attack.endpoint} from ${attack.sourceIP}`,
+      className: "border-destructive bg-destructive/10",
+    });
+  }, [newAttack, toast]);
 
-        if (newAttack && newAttack.id) {
-          setAttacks((prev) => [newAttack, ...prev.slice(0, 49)]); // Keep last 50
-          setTotalAttacks((prev) => prev + 1);
-
-          // Toast notification for new attack
-          toast({
-            title: "🚨 New Attack Detected",
-            description: `Attack on ${newAttack.endpoint} from ${newAttack.sourceIP}`,
-            className: "border-destructive bg-destructive/10",
-          });
-        }
-      } catch (err) {
-        console.error("Error fetching latest attack:", err);
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [toast]);
+  // Keep local list in sync with latestAttacks bootstrap data
+  useEffect(() => {
+    if (latestAttacks.length > 0) {
+      const list = latestAttacks.map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) }));
+      setAttacks(list);
+    }
+  }, [latestAttacks]);
 
   return (
     <div className="flex-1 p-6 space-y-6">

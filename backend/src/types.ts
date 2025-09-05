@@ -8,6 +8,8 @@ export interface Attack {
   method: string;
   payload?: string;
   blocked: boolean;
+  country?: string;
+  city?: string;
 }
 
 export interface ApiError {
@@ -25,3 +27,24 @@ export type AsyncRequestHandler = (
   req: Request,
   res: Response
 ) => Promise<void>;
+
+export interface DeviceInfo {
+  id: string;
+  name: string;
+  type: 'camera' | 'lock' | 'router' | 'thermostat' | 'plug';
+  status: 'online' | 'offline';
+  attacks: number;
+  ip: string;
+  location: string;
+  lastSeen: string;
+  firmware?: string;
+  uptime?: string;
+  image?: string;
+}
+
+export interface Settings {
+  autoBlock: boolean;
+  threatThreshold: number;
+  websocketEnabled: boolean;
+  retentionDays: number;
+}
