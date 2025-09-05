@@ -109,8 +109,15 @@ honeypotEndpoints.forEach(endpoint => {
 router.get("/api/attacks", asyncHandler(async (_req: Request, res: Response) => {
   const response: ApiResponse<AttackResponse[]> = {
     data: attacks.map(attack => ({
-      ...attack,
-      timestamp: attack.timestamp.toISOString()
+      id: attack.id,
+      timestamp: attack.timestamp.toISOString(),
+      sourceIP: attack.sourceIP,
+      endpoint: attack.endpoint,
+      method: attack.method,
+      payload: attack.payload,
+      blocked: attack.blocked,
+      country: attack.country,
+      city: attack.city
     }))
   };
   res.json(response);
@@ -133,8 +140,15 @@ router.get("/api/attacks/latest", asyncHandler(async (_req: Request, res: Respon
   
   const response: ApiResponse<AttackResponse> = {
     data: {
-      ...attacks[0],
-      timestamp: attacks[0].timestamp.toISOString()
+      id: attacks[0].id,
+      timestamp: attacks[0].timestamp.toISOString(),
+      sourceIP: attacks[0].sourceIP,
+      endpoint: attacks[0].endpoint,
+      method: attacks[0].method,
+      payload: attacks[0].payload,
+      blocked: attacks[0].blocked,
+      country: attacks[0].country,
+      city: attacks[0].city
     }
   };
   res.json(response);
