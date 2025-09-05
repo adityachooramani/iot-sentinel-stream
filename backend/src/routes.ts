@@ -162,11 +162,19 @@ router.post('/api/devices', asyncHandler(async (req: Request, res: Response) => 
     res.status(400).json({ error: 'Missing required fields: name, type, ip, location' });
     return;
   }
+  
+  // Validate device type
+  const validTypes = ['camera', 'lock', 'router', 'thermostat', 'plug'] as const;
+  if (!validTypes.includes(type as any)) {
+    res.status(400).json({ error: `Invalid device type. Must be one of: ${validTypes.join(', ')}` });
+    return;
+  }
+  
   const id = `${type}-${Math.random().toString(36).slice(2, 6)}`;
   const newDevice = {
     id,
     name,
-    type,
+    type: type as 'camera' | 'lock' | 'router' | 'thermostat' | 'plug',
     status: 'online' as const,
     attacks: 0,
     ip,
