@@ -1,7 +1,7 @@
 import { Router, Request, Response } from "express";
 import { attacks, MAX_ATTACKS, devices, settings } from "./db";
 import { getIo } from "./socket";
-import { Attack, AsyncRequestHandler, ApiResponse } from "./types";
+import { Attack, AttackResponse, AsyncRequestHandler, ApiResponse } from "./types";
 import { randomUUID } from "crypto";
 
 const router = Router();
@@ -107,7 +107,7 @@ honeypotEndpoints.forEach(endpoint => {
 });
 
 router.get("/api/attacks", asyncHandler(async (_req: Request, res: Response) => {
-  const response: ApiResponse<Attack[]> = {
+  const response: ApiResponse<AttackResponse[]> = {
     data: attacks.map(attack => ({
       ...attack,
       timestamp: attack.timestamp.toISOString()
@@ -131,7 +131,7 @@ router.get("/api/attacks/latest", asyncHandler(async (_req: Request, res: Respon
     return;
   }
   
-  const response: ApiResponse<Attack> = {
+  const response: ApiResponse<AttackResponse> = {
     data: {
       ...attacks[0],
       timestamp: attacks[0].timestamp.toISOString()

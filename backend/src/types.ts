@@ -12,6 +12,18 @@ export interface Attack {
   city?: string;
 }
 
+export interface AttackResponse {
+  id: string;
+  timestamp: string;
+  sourceIP: string;
+  endpoint: string;
+  method: string;
+  payload?: string;
+  blocked: boolean;
+  country?: string;
+  city?: string;
+}
+
 export interface ApiError {
   error: string;
   message?: string;
