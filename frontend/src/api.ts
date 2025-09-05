@@ -9,6 +9,8 @@ export interface Attack {
   method: string;
   payload?: string;
   blocked: boolean;
+  country?: string;
+  city?: string;
 }
 
 interface ApiResponse<T> {

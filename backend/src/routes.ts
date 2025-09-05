@@ -91,7 +91,10 @@ honeypotEndpoints.forEach(endpoint => {
     // Broadcast new attack over WebSocket
     const io = getIo();
     if (io) {
-      io.emit('new_attack', attack);
+      io.emit('new_attack', {
+        ...attack,
+        timestamp: attack.timestamp.toISOString()
+      });
     }
 
     const response: ApiResponse<{ attackId: string }> = {
@@ -107,7 +110,7 @@ router.get("/api/attacks", asyncHandler(async (_req: Request, res: Response) => 
   const response: ApiResponse<Attack[]> = {
     data: attacks.map(attack => ({
       ...attack,
-      timestamp: attack.timestamp
+      timestamp: attack.timestamp.toISOString()
     }))
   };
   res.json(response);
@@ -131,7 +134,7 @@ router.get("/api/attacks/latest", asyncHandler(async (_req: Request, res: Respon
   const response: ApiResponse<Attack> = {
     data: {
       ...attacks[0],
-      timestamp: attacks[0].timestamp
+      timestamp: attacks[0].timestamp.toISOString()
     }
   };
   res.json(response);

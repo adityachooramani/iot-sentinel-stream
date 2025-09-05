@@ -3,12 +3,14 @@ import { Badge } from "@/components/ui/badge";
 
 interface Attack {
   id: string;
-  timestamp: Date;
+  timestamp: string;
   sourceIP: string;
   endpoint: string;
   method: string;
   payload?: string;
   blocked: boolean;
+  country?: string;
+  city?: string;
 }
 
 interface RecentAttacksProps {
@@ -18,7 +20,8 @@ interface RecentAttacksProps {
 export const RecentAttacks = ({ attacks }: RecentAttacksProps) => {
   const recentAttacks = attacks.slice(0, 10);
 
-  const formatTime = (date: Date) => {
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffSeconds = Math.floor(diffMs / 1000);

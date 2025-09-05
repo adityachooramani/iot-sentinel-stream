@@ -2,12 +2,14 @@ import { Shield, AlertTriangle, Eye, Clock } from "lucide-react";
 
 interface Attack {
   id: string;
-  timestamp: Date;
+  timestamp: string;
   sourceIP: string;
   endpoint: string;
   method: string;
   payload?: string;
   blocked: boolean;
+  country?: string;
+  city?: string;
 }
 
 interface AttackMetricsProps {
@@ -19,7 +21,7 @@ export const AttackMetrics = ({ attacks, totalAttacks }: AttackMetricsProps) => 
   const recentAttacks = attacks.length;
   const blockedAttacks = attacks.filter(a => a.blocked).length;
   const uniqueIPs = new Set(attacks.map(a => a.sourceIP)).size;
-  const lastAttack = attacks[0]?.timestamp;
+  const lastAttack = attacks[0]?.timestamp ? new Date(attacks[0].timestamp) : null;
   const lastAttackerIp = attacks[0]?.sourceIP;
   const lastAttackerGeo = [attacks[0]?.city, attacks[0]?.country].filter(Boolean).join(', ');
 

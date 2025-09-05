@@ -16,6 +16,8 @@ interface Attack {
   method: string;
   payload?: string;
   blocked: boolean;
+  country?: string;
+  city?: string;
 }
 
 const mockDevices = [
@@ -41,7 +43,7 @@ export const Dashboard = () => {
         ]);
         const attacksJson = await attacksRes.json();
         const statsJson = await statsRes.json();
-        const list = (attacksJson.data || []).map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) }));
+        const list = attacksJson.data || [];
         setAttacks(list);
         setTotalAttacks(statsJson?.data?.totalAttacks || list.length);
       } catch (err) {
@@ -55,12 +57,11 @@ export const Dashboard = () => {
   // Handle websocket-delivered new attacks
   useEffect(() => {
     if (!newAttack) return;
-    const attack = { ...newAttack, timestamp: new Date(newAttack.timestamp) } as any;
-    setAttacks((prev) => [attack, ...prev].slice(0, 50));
+    setAttacks((prev) => [newAttack, ...prev].slice(0, 50));
     setTotalAttacks((prev) => prev + 1);
     toast({
       title: "🚨 New Attack Detected",
-      description: `Attack on ${attack.endpoint} from ${attack.sourceIP}`,
+      description: `Attack on ${newAttack.endpoint} from ${newAttack.sourceIP}`,
       className: "border-destructive bg-destructive/10",
     });
   }, [newAttack, toast]);
@@ -68,8 +69,7 @@ export const Dashboard = () => {
   // Keep local list in sync with latestAttacks bootstrap data
   useEffect(() => {
     if (latestAttacks.length > 0) {
-      const list = latestAttacks.map((a: any) => ({ ...a, timestamp: new Date(a.timestamp) }));
-      setAttacks(list);
+      setAttacks(latestAttacks);
     }
   }, [latestAttacks]);
 

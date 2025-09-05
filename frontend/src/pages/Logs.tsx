@@ -13,10 +13,7 @@ const Logs = () => {
     try {
       setLoading(true);
       const data = await fetchAttacks();
-      // Convert timestamps to Date for AttackLogs component
-      setAttacks(
-        data.map((a) => ({ ...a, timestamp: new Date(a.timestamp) })) as unknown as Attack[]
-      );
+      setAttacks(data);
       setError(null);
     } catch (e) {
       setError("Failed to load attacks");
@@ -31,7 +28,7 @@ const Logs = () => {
 
   useEffect(() => {
     if (!newAttack) return;
-    setAttacks(prev => [{ ...newAttack, timestamp: new Date(newAttack.timestamp) } as any, ...prev].slice(0, 200));
+    setAttacks(prev => [newAttack, ...prev].slice(0, 200));
   }, [newAttack]);
 
   if (loading) {
@@ -41,7 +38,7 @@ const Logs = () => {
     return <div className="flex-1 p-6 text-destructive">{error}</div>;
   }
 
-  return <AttackLogs attacks={attacks as unknown as any[]} />;
+  return <AttackLogs attacks={attacks} />;
 };
 
 export default Logs;

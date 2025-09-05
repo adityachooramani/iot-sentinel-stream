@@ -6,12 +6,14 @@ import { Badge } from "@/components/ui/badge";
 
 interface Attack {
   id: string;
-  timestamp: Date;
+  timestamp: string;
   sourceIP: string;
   endpoint: string;
   method: string;
   payload?: string;
   blocked: boolean;
+  country?: string;
+  city?: string;
 }
 
 interface AttackLogsProps {
@@ -48,8 +50,8 @@ export const AttackLogs = ({ attacks }: AttackLogsProps) => {
     }
   };
 
-  const formatTimestamp = (date: Date) => {
-    return date.toLocaleString();
+  const formatTimestamp = (timestamp: string) => {
+    return new Date(timestamp).toLocaleString();
   };
 
   return (

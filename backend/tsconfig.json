@@ -12,7 +12,6 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "declaration": true,
-    "types": ["node", "cors"],
     "typeRoots": ["./node_modules/@types"]
   },
   "include": ["src/**/*"],

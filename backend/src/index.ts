@@ -79,7 +79,10 @@ setIo(io);
 io.on('connection', (socket) => {
   socket.emit('status', { message: 'Connected', serverTime: new Date().toISOString() });
   socket.on('request_latest_attacks', () => {
-    socket.emit('latest_attacks', attacks.slice(0, 10));
+    socket.emit('latest_attacks', attacks.slice(0, 10).map(attack => ({
+      ...attack,
+      timestamp: attack.timestamp.toISOString()
+    })));
   });
 });
 
